@@ -1,18 +1,30 @@
 using IpLookupService;
+using IpLookupService.Middleware;
 using IpLookupService.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+
+const string externalIPProviderName = "IpStack";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.Configure<IPStackSettings>(builder.Configuration.GetSection(externalIPProviderName));
+
+
+builder.Services.AddHttpClient<IExternalIPService, ExternalIPService>(
+    (sp, client) =>
+{
+    var settings = sp.GetRequiredService<IOptions<IPStackSettings>>().Value;
+    
+    client.BaseAddress = new Uri(settings.BaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

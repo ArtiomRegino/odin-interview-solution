@@ -1,4 +1,6 @@
-﻿using IpLookupService.Services;
+﻿using IpLookupService.Models;
+using IpLookupService.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IpLookupService;
 
@@ -6,25 +8,34 @@ internal static class Endpoints
 {
     internal static void UseIpAddressEndpoints(this WebApplication app)
     {
-        app.MapGet("/ip/{ipAddress}", GetIpAddressDetails());
+        app.MapGet("/ip/{ipAddress}", GetIpAddressDetails())
+            .WithName("GetIpDetails")
+            .WithSummary("Retrieve IP address details")
+            .WithDescription("""
+                             Retrieves geographical, network, and connection details for a given IP address
+                             using the external IPStack API.
+                             """)
+            .Produces<IPDetailsDto>()
+            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status502BadGateway)
+            .Produces<ProblemDetails>(StatusCodes.Status503ServiceUnavailable)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
+            .WithOpenApi();
     }
 
-    private static Func<string, ILogger<WebApplication>, IIpAddressService, Task<IResult>> GetIpAddressDetails()
+    private static Func<string, IExternalIPService, Task<IResult>> GetIpAddressDetails()
     {
-        return async (ipAddress, logger, ipAddressService) =>
+        return async (ipAddress, ipAddressService) =>
         {
-            var isIpValid = IpValidator.IsValidIp(ipAddress);
-            if (isIpValid)
+            var isNotValidIp = IpValidator.IsNotValidIp(ipAddress);
+            if (isNotValidIp)
             {
-                var result = await ipAddressService.GetIpDetailsAsync(ipAddress);
-                return Results.Ok(result);
+                throw new ArgumentException("Invalid IP address");
             }
 
-            return Results.BadRequest(new
-            {
-                error = "Invalid IP address",
-                code = 400
-            });
+            var result = await ipAddressService.GetIpDetailsAsync(ipAddress);
+            
+            return Results.Ok(result);
         };
     }
 }
