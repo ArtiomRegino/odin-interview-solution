@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IpLookupService", "IpLookupService\IpLookupService.csproj", "{FE892A18-C654-4BC6-9557-F31A6BC6721A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService", "CacheService\CacheService.csproj", "{FCD0DC3D-9F9D-4073-B3F9-CA64EE684B41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchService", "BatchService\BatchService.csproj", "{203988A7-072F-4327-B7B0-141DA27C3FAA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE892A18-C654-4BC6-9557-F31A6BC6721A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE892A18-C654-4BC6-9557-F31A6BC6721A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE892A18-C654-4BC6-9557-F31A6BC6721A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE892A18-C654-4BC6-9557-F31A6BC6721A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCD0DC3D-9F9D-4073-B3F9-CA64EE684B41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCD0DC3D-9F9D-4073-B3F9-CA64EE684B41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCD0DC3D-9F9D-4073-B3F9-CA64EE684B41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCD0DC3D-9F9D-4073-B3F9-CA64EE684B41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{203988A7-072F-4327-B7B0-141DA27C3FAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{203988A7-072F-4327-B7B0-141DA27C3FAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{203988A7-072F-4327-B7B0-141DA27C3FAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{203988A7-072F-4327-B7B0-141DA27C3FAA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
