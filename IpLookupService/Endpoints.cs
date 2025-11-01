@@ -1,4 +1,5 @@
-﻿using IpLookupService.Models;
+﻿using Common.Extensions;
+using Common.Models;
 using IpLookupService.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,15 +28,19 @@ internal static class Endpoints
     {
         return async (ipAddress, ipAddressService) =>
         {
-            var isNotValidIp = IpValidator.IsNotValidIp(ipAddress);
-            if (isNotValidIp)
-            {
-                throw new ArgumentException("Invalid IP address");
-            }
-
+            ValidateIPAddress(ipAddress);
             var result = await ipAddressService.GetIpDetailsAsync(ipAddress);
             
             return Results.Ok(result);
         };
+    }
+    
+    private static void ValidateIPAddress(string ipAddress)
+    {
+        var isNotValidIp = IpValidator.IsNotValidIp(ipAddress);
+        if (isNotValidIp)
+        {
+            throw new ArgumentException("Invalid IP address");
+        }
     }
 }

@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.Tests", "tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchService.Tests", "tests\BatchService.Tests\BatchService.Tests.csproj", "{5D3C10E1-A14C-48C4-AE12-CFB112575AF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{042F630C-B227-493A-8585-1A2624E9E121}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{5D3C10E1-A14C-48C4-AE12-CFB112575AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D3C10E1-A14C-48C4-AE12-CFB112575AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D3C10E1-A14C-48C4-AE12-CFB112575AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{042F630C-B227-493A-8585-1A2624E9E121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{042F630C-B227-493A-8585-1A2624E9E121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{042F630C-B227-493A-8585-1A2624E9E121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{042F630C-B227-493A-8585-1A2624E9E121}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

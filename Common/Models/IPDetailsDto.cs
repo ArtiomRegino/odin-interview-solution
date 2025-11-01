@@ -1,4 +1,4 @@
-﻿namespace IpLookupService.Models;
+﻿namespace Common.Models;
 
 public class IPDetailsDto
 {

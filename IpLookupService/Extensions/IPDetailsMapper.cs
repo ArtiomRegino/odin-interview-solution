@@ -1,4 +1,5 @@
-﻿using IpLookupService.Models;
+﻿using Common.Models;
+using IpLookupService.Models;
 using IpLookupService.Models.IpStack;
 
 namespace IpLookupService.Extensions;

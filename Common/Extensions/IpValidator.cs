@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace IpLookupService;
+namespace Common.Extensions;
 
 public static class IpValidator
 {

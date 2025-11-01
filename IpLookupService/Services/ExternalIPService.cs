@@ -1,6 +1,7 @@
-﻿using IpLookupService.Exceptions;
+﻿using Common.Extensions;
+using Common.Models;
+using IpLookupService.Exceptions;
 using IpLookupService.Extensions;
-using IpLookupService.Models;
 using IpLookupService.Models.IpStack;
 using Microsoft.Extensions.Options;
 
