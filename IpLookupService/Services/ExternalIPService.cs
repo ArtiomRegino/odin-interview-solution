@@ -69,11 +69,11 @@ public class ExternalIPService: IExternalIPService
         if (error is not null)
         {
             _logger.LogWarning("IP provider error {Code} ({Type}) for {Ip}: {Info}", error.Code, error.Type, ipAddress, error.Info);
-            throw new IPServiceNotAvailableException(error.Code, error.Type, error.Info);
+            throw new IPServiceException(error.Code, error.Type, error.Info);
         }
         
         _logger.LogWarning("IP provider returned non-success status code {Status} for IP {Ip}", response.StatusCode, ipAddress);
-        throw new IPServiceNotAvailableException((int)response.StatusCode);
+        throw new IPServiceException((int)response.StatusCode);
     }
 
     private async Task<IpStackResponse> ParseSuccessResponse(HttpResponseMessage response, string ipAddress,

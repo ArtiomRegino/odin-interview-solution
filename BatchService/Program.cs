@@ -1,21 +1,33 @@
 using System.Reflection;
 using System.Threading.Channels;
+using System.Threading.RateLimiting;
 using BatchService;
 using BatchService.Configuration;
 using BatchService.Contracts;
 using BatchService.Models;
 using BatchService.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
-var builder = WebApplication.CreateBuilder(args);
-
-
 const string ipLookupName = "IPLookup";
+
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("batch-post-policy", cfg =>
+    {
+        cfg.PermitLimit = 5;
+        cfg.Window = TimeSpan.FromSeconds(10);
+        cfg.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        cfg.QueueLimit = 0;
+    });
 });
 
 builder.Services.AddEndpointsApiExplorer();

@@ -15,12 +15,16 @@ public class IPServiceException : Exception
     {
     }
     
+    public IPServiceException(int code) : base($"IP provider returned status code {code}.")
+    {
+        Code = code;
+    }
+    
     public IPServiceException(string message, Exception innerException) : base(message, innerException)
     {
     }
 
-    protected IPServiceException(int code, string type, string info)
-        : base($"IP provider error {code} ({type}): {info}")
+    public IPServiceException(int code, string type, string info) : base($"IP provider error {code} ({type}): {info}")
     {
         Code = code;
         Type = type;

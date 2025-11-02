@@ -2,6 +2,7 @@ using BatchService.Contracts;
 using BatchService.Models;
 using Common.Validation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BatchService.Controllers;
 
@@ -9,6 +10,8 @@ namespace BatchService.Controllers;
 [Route("batch")]
 public class BatchController : ControllerBase
 {
+    private const int MaxBatchSize = 1000;
+    
     private readonly ILogger<BatchController> _logger;
     private readonly IBatchStore _batchStore;
     private readonly IBatchScheduler _batchScheduler;
@@ -46,6 +49,7 @@ public class BatchController : ControllerBase
     /// <response code="400">No valid IP addresses were provided.</response>
     /// <response code="500">Unhandled server error.</response>
     [HttpPost]
+    [EnableRateLimiting("batch-post-policy")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -56,6 +60,11 @@ public class BatchController : ControllerBase
             throw new ArgumentException("At least one IP address must be provided.", nameof(ipAddresses));
         }
 
+        if (ipAddresses.Length > MaxBatchSize)
+        {
+            throw new ArgumentException($"Batch can contain up to {MaxBatchSize} entities.", nameof(ipAddresses));
+        }
+        
         var invalidIPAddresses = ipAddresses.Where(ipAddress => ipAddress.IsNotValidIp()).ToArray();
         if (invalidIPAddresses.Length == ipAddresses.Length)
         {
