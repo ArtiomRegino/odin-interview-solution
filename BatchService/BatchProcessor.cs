@@ -27,30 +27,48 @@ public class BatchProcessor: BackgroundService
         
         await foreach (var job in _batchQueue.DequeueAsync(ct))
         {
-            await ProcessJob(job, ct);
+            try
+            {
+                await ProcessJob(job.BatchId, ct);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                _logger.LogInformation("BatchProcessor stopped due to cancellation.");
+                break;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled error while processing batch {BatchId}", job.BatchId);
+            }
         }
         
         _logger.LogInformation("BatchProcessor finished");
     }
 
-    private async Task ProcessJob(BatchJob job, CancellationToken ct)
+    private async Task ProcessJob(Guid batchId, CancellationToken ct)
     {
-        var batch = _batchStore.GetBatch(job.BatchId);
+        var batch = _batchStore.GetBatch(batchId);
         if (batch == null)
         {
-            _logger.LogWarning("Batch {BatchId} not found", job.BatchId);
+            _logger.LogWarning("Batch {BatchId} not found", batchId);
+            return;
+        }
+
+        if (batch.Status is BatchStatus.Completed or BatchStatus.Running )
+        {
+            _logger.LogWarning("Batch {BatchId} is already taken by another BatchProcessor instance.", batchId);
             return;
         }
         
-        _batchStore.MarkBatchRunning(job.BatchId);
+        _batchStore.MarkBatchRunning(batchId);
         
-        var ipChunks = batch.Items.Chunk(ChunkSize);
+        var ipChunks = batch.Items.Values.Chunk(ChunkSize);
         foreach (var chunk in ipChunks)
         {
-            await ProcessChunk(job.BatchId, chunk, ct);
+            await ProcessChunk(batchId, chunk, ct);
         }
 
-        _batchStore.MarkBatchCompleted(job.BatchId);
+        _batchStore.MarkBatchCompleted(batchId);
     }
 
     private async Task ProcessChunk(Guid batchId, IpWorkItemDto[] chunk, CancellationToken ct)

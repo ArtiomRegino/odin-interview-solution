@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Threading.Channels;
 using BatchService;
 using BatchService.Configuration;
@@ -5,16 +6,36 @@ using BatchService.Contracts;
 using BatchService.Models;
 using BatchService.Services;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 const string ipLookupName = "IPLookup";
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Batch Service API",
+        Version = "v1",
+        Description = "Handles asynchronous batch IP processing."
+    });
+    
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
+
 builder.Services.Configure<IPLookupSettings>(builder.Configuration.GetSection(ipLookupName));
 
 builder.Services.AddTransient<IIPLookupService, IPLookupService>();
