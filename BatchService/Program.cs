@@ -1,6 +1,8 @@
+using System.Threading.Channels;
 using BatchService;
 using BatchService.Configuration;
 using BatchService.Contracts;
+using BatchService.Models;
 using BatchService.Services;
 using Microsoft.Extensions.Options;
 
@@ -16,6 +18,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<IPLookupSettings>(builder.Configuration.GetSection(ipLookupName));
 
 builder.Services.AddTransient<IIPLookupService, IPLookupService>();
+builder.Services.AddTransient<IBatchScheduler, BatchScheduler>();
+builder.Services.AddSingleton<IBatchStore, BatchStore>();
+builder.Services.AddSingleton<IBatchQueue, BatchQueue>();
 
 builder.Services.AddHttpClient<IIPLookupService, IPLookupService>(
     (sp, client) =>
@@ -26,7 +31,14 @@ builder.Services.AddHttpClient<IIPLookupService, IPLookupService>(
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     });
 
-builder.Services.AddHostedService<BatchProcessorBackgroundService>();
+builder.Services.AddHostedService<BatchProcessor>();
+builder.Services.AddSingleton<Channel<BatchJob>>(_ => Channel.CreateUnbounded<BatchJob>(
+    new UnboundedChannelOptions
+{
+    SingleReader = false,
+    SingleWriter = false
+}));
+
 var app = builder.Build();
 
 

@@ -30,8 +30,7 @@ public class BatchController : ControllerBase
         var invalidIPAddresses = ipAddresses.Where(ipAddress => ipAddress.IsValidIp()).ToArray();
         if (invalidIPAddresses.Length == ipAddresses.Length)
         {
-            return BadRequest(CreateProblem(StatusCodes.Status400BadRequest, "Invalid request",
-                "No valid IP addresses were provided."));
+            throw new ArgumentException("No valid IP addresses were provided.", nameof(ipAddresses));
         }
         
         var batchId = _batchScheduler.Schedule(ipAddresses);
@@ -42,10 +41,10 @@ public class BatchController : ControllerBase
     [HttpGet("/{batchId}")]
     public ActionResult<BatchStatusDto> GetBatchStatus([FromRoute] Guid batchId)
     {
-        var batchStatus = _batchStore.GetBatchStatus();
-        
+        var batchStatus = _batchStore.GetBatch(batchId);
         if (batchStatus is null)
         {
+            _logger.LogInformation($"Batch with id {batchId} not found.");
             return NotFound(CreateProblem(StatusCodes.Status404NotFound, "Batch not found",
                 "No batch with the specified ID exists or it has already expired."));
         }
