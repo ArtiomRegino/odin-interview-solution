@@ -1,7 +1,6 @@
 ﻿using Common.Models;
-using IpLookupService.Models;
 
-namespace IpLookupService.Services;
+namespace IpLookupService.Contracts;
 
 public interface IExternalIPService
 {

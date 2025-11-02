@@ -1,4 +1,4 @@
-﻿namespace IpLookupService;
+﻿namespace IpLookupService.Configuration;
 
 public class IPStackSettings
 {

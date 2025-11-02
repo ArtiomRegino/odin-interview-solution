@@ -1,6 +1,6 @@
 ﻿using CacheService.CacheService;
-using Common.Extensions;
 using Common.Models;
+using Common.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CacheService;
@@ -16,10 +16,10 @@ internal static class Endpoints
                              Returns cached details for the given IP address if present and not expired.
                              TTL is 1 minute per IP entry.
                              """)
-            .Produces<IPDetailsDto>(StatusCodes.Status200OK, "Cached IP details found.")
-            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest, "Invalid request.")
+            .Produces<IPDetailsDto>(StatusCodes.Status200OK)
+            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError, "Unexpected error.")
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
             .WithOpenApi();
 
         app.MapPut("/cache/{ipAddress}", PutCachedIpDetails())
@@ -30,8 +30,8 @@ internal static class Endpoints
                              Cache entries expire automatically 1 minute after insertion.
                              """)
             .Produces(StatusCodes.Status204NoContent)
-            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest, "Invalid request.")
-            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError, "Unexpected error.")
+            .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
             .WithOpenApi();
 
     }
@@ -40,8 +40,7 @@ internal static class Endpoints
     {
         return ([FromRoute] ipAddress, cache) =>
         {
-            ValidateIPAddress(ipAddress);
-
+            IpValidator.ValidateIPAddressOrThrow(ipAddress);
             if (!cache.TryGet(ipAddress, out var ipAddressDetails) || ipAddressDetails is null)
             {
                 return Results.NotFound();
@@ -55,8 +54,7 @@ internal static class Endpoints
     {
         return ([FromRoute] ipAddress, [FromBody] ipDetails, cache) =>
         {
-            ValidateIPAddress(ipAddress);
-
+            IpValidator.ValidateIPAddressOrThrow(ipAddress);
             if (ipDetails is null)
             {
                 throw new ArgumentException("Request body is required.");
@@ -70,14 +68,5 @@ internal static class Endpoints
             cache.Set(ipAddress, ipDetails);
             return Results.NoContent();
         };
-    }
-
-    private static void ValidateIPAddress(string ipAddress)
-    {
-        var isNotValidIp = IpValidator.IsNotValidIp(ipAddress);
-        if (isNotValidIp)
-        {
-            throw new ArgumentException("Invalid IP address");
-        }
     }
 }

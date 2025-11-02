@@ -1,6 +1,6 @@
-﻿using Common.Extensions;
-using Common.Models;
-using IpLookupService.Services;
+﻿using Common.Models;
+using Common.Validation;
+using IpLookupService.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IpLookupService;
@@ -24,23 +24,14 @@ internal static class Endpoints
             .WithOpenApi();
     }
 
-    private static Func<string, IExternalIPService, Task<IResult>> GetIpAddressDetails()
+    private static Func<string, IIPDetailsProvider, Task<IResult>> GetIpAddressDetails()
     {
-        return async (ipAddress, ipAddressService) =>
+        return async (ipAddress, ipDetailsProvider) =>
         {
-            ValidateIPAddress(ipAddress);
-            var result = await ipAddressService.GetIpDetailsAsync(ipAddress);
+            IpValidator.ValidateIPAddressOrThrow(ipAddress);
+            var result = await ipDetailsProvider.GetIpDetails(ipAddress);
             
             return Results.Ok(result);
         };
-    }
-    
-    private static void ValidateIPAddress(string ipAddress)
-    {
-        var isNotValidIp = IpValidator.IsNotValidIp(ipAddress);
-        if (isNotValidIp)
-        {
-            throw new ArgumentException("Invalid IP address");
-        }
     }
 }

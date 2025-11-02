@@ -22,13 +22,11 @@ public class GlobalExceptionMiddleware
         catch (ArgumentException ex)
         {
             _logger.LogWarning(ex, "Bad request: {Message}", ex.Message);
-
             await WriteProblem(context, statusCode: StatusCodes.Status400BadRequest, title: "Invalid request", detail: ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled error");
-
             await WriteProblem(context, statusCode: StatusCodes.Status500InternalServerError,
                 title: "Internal server error", detail: "An unexpected error occurred.");
         }

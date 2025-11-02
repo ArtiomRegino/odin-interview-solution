@@ -22,6 +22,10 @@ public class MemoryCacheStore : ICacheStore
 
     public void Set(string ip, IPDetailsDto details)
     {
-        _memoryCache.Set(ip, details, _ttl);
+        _memoryCache.Set(ip, details, new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = _ttl,
+            Size = 1,
+        });
     }
 }

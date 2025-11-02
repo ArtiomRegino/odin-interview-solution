@@ -1,5 +1,7 @@
-﻿using Common.Extensions;
-using Common.Models;
+﻿using Common.Models;
+using Common.Validation;
+using IpLookupService.Configuration;
+using IpLookupService.Contracts;
 using IpLookupService.Exceptions;
 using IpLookupService.Extensions;
 using IpLookupService.Models.IpStack;
@@ -22,7 +24,17 @@ public class ExternalIPService: IExternalIPService
 
     public async Task<IPDetailsDto> GetIpDetailsAsync(string ipAddress, CancellationToken ct = default)
     {
-        ValidateIPAddress(ipAddress);
+        IpValidator.ValidateIPAddressOrThrow(ipAddress);
+        var response = await SendIPDetailsRequest(ipAddress, ct);
+
+        await HandleNonSuccessResponse(response, ipAddress, ct);
+        var ipStackResponse = await ParseSuccessResponse(response, ipAddress, ct);
+        
+        return ipStackResponse.MapToDto();
+    }
+
+    private async Task<HttpResponseMessage> SendIPDetailsRequest(string ipAddress, CancellationToken ct)
+    {
         HttpResponseMessage response;
         try
         {
@@ -34,19 +46,7 @@ public class ExternalIPService: IExternalIPService
             throw new IPServiceNotAvailableException("Network error in IP provider.", e);
         }
 
-        await HandleNonSuccessResponse(response, ipAddress, ct);
-        var ipStackResponse = await ParseSuccessResponse(response, ipAddress, ct);
-        
-        return ipStackResponse.MapToDto();
-    }
-    
-    private static void ValidateIPAddress(string ipAddress)
-    {
-        var isNotValidIp = IpValidator.IsNotValidIp(ipAddress);
-        if (isNotValidIp)
-        {
-            throw new ArgumentException("Invalid IP address format", nameof(ipAddress));
-        }
+        return response;
     }
 
     private async Task HandleNonSuccessResponse(HttpResponseMessage response, string ipAddress, CancellationToken ct)

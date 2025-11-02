@@ -18,8 +18,8 @@ public class IPServiceException : Exception
     public IPServiceException(string message, Exception innerException) : base(message, innerException)
     {
     }
-    
-    public IPServiceException(int code, string type, string info)
+
+    protected IPServiceException(int code, string type, string info)
         : base($"IP provider error {code} ({type}): {info}")
     {
         Code = code;
