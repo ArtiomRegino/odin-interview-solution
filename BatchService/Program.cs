@@ -76,7 +76,6 @@ builder.Services.AddSingleton<Channel<BatchJob>>(_ => Channel.CreateUnbounded<Ba
 
 var app = builder.Build();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

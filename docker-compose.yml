@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  ip-cache-service:
+    build:
+      context: .
+      dockerfile: CacheService/Dockerfile
+    container_name: cache-service
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+    ports:
+      - "5001:8080"
+    networks:
+      - internal-net
+
+  ip-lookup-service:
+    build:
+      context: .
+      dockerfile: IpLookupService/Dockerfile
+    container_name: ip-lookup-service
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+
+      Cache__BaseUrl: "http://ip-cache-service:8080"
+
+      IpStack__BaseUrl: "http://api.ipstack.com"
+      IpStack__ApiKey: "b51c29c794d1a3e6fdd8570fe656918d"
+    depends_on:
+      - ip-cache-service
+    ports:
+      - "5002:8080"
+    networks:
+      - internal-net
+
+  batch-service:
+    build:
+      context: .
+      dockerfile: BatchService/Dockerfile
+    container_name: batch-service
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+
+      IPLookup__BaseUrl: "http://ip-lookup-service:8080"
+    depends_on:
+      - ip-lookup-service
+    ports:
+      - "5003:8080"
+    networks:
+      - internal-net
+
+networks:
+  internal-net:
+    driver: bridge
