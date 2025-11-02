@@ -4,6 +4,7 @@ using System.Threading.RateLimiting;
 using BatchService;
 using BatchService.Configuration;
 using BatchService.Contracts;
+using BatchService.Jobs;
 using BatchService.Models;
 using BatchService.Services;
 using Microsoft.AspNetCore.RateLimiting;
@@ -65,6 +66,7 @@ builder.Services.AddHttpClient<IIPLookupService, IPLookupService>(
     });
 
 builder.Services.AddHostedService<BatchProcessor>();
+builder.Services.AddHostedService<BatchCleanupWorker>();
 builder.Services.AddSingleton<Channel<BatchJob>>(_ => Channel.CreateUnbounded<BatchJob>(
     new UnboundedChannelOptions
 {

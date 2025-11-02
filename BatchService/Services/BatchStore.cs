@@ -16,6 +16,11 @@ public class BatchStore : IBatchStore
             throw new InvalidOperationException($"Batch with id {batchStatus.BatchId} already exists.");
         }
     }
+
+    public void RemoveBatch(Guid batchId)
+    {
+        _batchStatuses.TryRemove(batchId, out _);
+    }
     
     public BatchStatusDto? GetBatch(Guid batchId)
     {
@@ -23,6 +28,11 @@ public class BatchStore : IBatchStore
         return batchStatus;
     }
 
+    public IEnumerable<BatchStatusDto> GetAllBatches()
+    {
+        return _batchStatuses.Values;
+    }
+    
     public void MarkBatchRunning(Guid batchId)
     {
         if (_batchStatuses.TryGetValue(batchId, out var batch))
@@ -36,6 +46,7 @@ public class BatchStore : IBatchStore
         if (_batchStatuses.TryGetValue(batchId, out var batch))
         {
             batch.Status = BatchStatus.Completed;
+            batch.CompletedAtUtc = DateTime.UtcNow;
         }
     }
 
