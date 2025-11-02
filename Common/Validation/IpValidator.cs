@@ -13,12 +13,12 @@ public static class IpValidator
         }
     }
  
-    private static bool IsNotValidIp(string ip)
+    public static bool IsNotValidIp(this string ip)
     {
         return !IsValidIp(ip);
     }
     
-    private static bool IsValidIp(string ip)
+    public static bool IsValidIp(this string ip)
     {
         return IPAddress.TryParse(ip, out _);
     }

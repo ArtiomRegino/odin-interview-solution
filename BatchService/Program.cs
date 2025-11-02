@@ -1,15 +1,35 @@
+using BatchService;
+using BatchService.Configuration;
+using BatchService.Contracts;
+using BatchService.Services;
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+const string ipLookupName = "IPLookup";
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.Configure<IPLookupSettings>(builder.Configuration.GetSection(ipLookupName));
 
+builder.Services.AddTransient<IIPLookupService, IPLookupService>();
+
+builder.Services.AddHttpClient<IIPLookupService, IPLookupService>(
+    (sp, client) =>
+    {
+        var settings = sp.GetRequiredService<IOptions<IPLookupSettings>>().Value;
+    
+        client.BaseAddress = new Uri(settings.BaseUrl);
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+    });
+
+builder.Services.AddHostedService<BatchProcessorBackgroundService>();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
