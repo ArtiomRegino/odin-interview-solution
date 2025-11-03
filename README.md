@@ -87,6 +87,7 @@ All configuration values can be set via appsettings.json or environment variable
 |                     | `Cache__BaseUrl`    | URL of cache service          | `http://ip-cache-service:8080`  |
 | **BatchService**    | `IPLookup__BaseUrl` | URL of lookup service         | `http://ip-lookup-service:8080` |
 | **CacheService**    | TTL                 | Cache expiration (1 minute)   | defined in code                 |
+
 Pay attention to `IpStack__ApiKey` setting. Yoy can find this key on https://ipstack.com/ in the personal account.
 
 ### 4. Build and run all services
